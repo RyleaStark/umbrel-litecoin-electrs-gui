@@ -124,8 +124,8 @@
       <p
         class="mt-12 text-neutral-900 dark:text-neutral-300 text-lg whitespace-normal"
       >
-        Looking for step-by-step instructions to connect your wallet to Electrs?
-        <a class="underline" href="https://link.umbrel.com/connect-electrs" target="_blank">Click here</a>.
+        Looking for a compatible wallet? Visit
+        <a class="underline" href="https://electrum-ltc.org/" target="_blank" rel="noopener noreferrer">Electrum-LTC</a>.
       </p>
     </div>
   </div>
