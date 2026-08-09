@@ -28,10 +28,9 @@ services:
       ELECTRS_DAEMON_P2P_ADDR: litecoind:19444
       ELECTRS_ELECTRUM_RPC_ADDR: 0.0.0.0:50002
       ELECTRS_SERVER_BANNER: Electrs (LTC)
-      ELECTRS_COOKIE_FILE: /data/.litecoin/regtest/.cookie
+      ELECTRS_AUTH: "umbrel:umbrel"
       ELECTRS_DB_DIR: /data/db
     volumes:
-      - ./data/litecoin:/data/.litecoin:ro
       - ./data/electrs:/data/db
     ports:
       - "50002:50002"
