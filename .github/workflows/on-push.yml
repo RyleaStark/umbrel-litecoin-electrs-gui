@@ -1,33 +1,25 @@
-name: Build and publish Docker image on push
-
-on: push
-
-env:
-  DOCKER_CLI_EXPERIMENTAL: enabled
-
+name: Build and publish image
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+  packages: write
 jobs:
   build:
-    name: Build Docker image
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-24.04
     steps:
-      - name: Set BRANCH
-        run: echo "BRANCH=$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//-/g')" >> $GITHUB_ENV
-
-      - name: Login to Docker Hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
-      - name: Checkout project
-        uses: actions/checkout@v2
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-
-      - name: Setup Docker buildx action
-        uses: docker/setup-buildx-action@v1
-
-      - name: Run Docker buildx
-        run: |
-          docker buildx build \
-          --platform linux/amd64,linux/arm64 \
-          --tag ${{ secrets.DOCKER_HUB_USER }}/umbrel-electrs:$BRANCH \
-          --push .
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ghcr.io/ryleastark/umbrel-litecoin-electrs-gui:${{ github.ref_name }}

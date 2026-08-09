@@ -1,8 +1,9 @@
 const ElectrumClient = require("@lily-technologies/electrum-client");
-const bitcoindService = require("services/bitcoind");
+const litecoindService = require("services/litecoind");
 
 const ELECTRS_HOST = process.env.ELECTRS_HOST || "0.0.0.0";
-const rpcClient = new ElectrumClient(50001, ELECTRS_HOST, "tcp");
+const ELECTRS_PORT = parseInt(process.env.ELECTRS_PORT, 10) || 50002;
+const rpcClient = new ElectrumClient(ELECTRS_PORT, ELECTRS_HOST, "tcp");
 
 async function getVersion() {
   const initClient = await rpcClient.initElectrum({
@@ -17,20 +18,20 @@ async function getVersion() {
   return version;
 }
 
-// This is a little hacky way of determining if electrs is sync'd to bitcoind
+// This is a little hacky way of determining if electrs is sync'd to litecoind
 // see https://github.com/romanz/electrs/pull/543#issuecomment-973078262
 async function syncPercent() {
   try {
-    // If Bitcoin node is still syncing, we return -1 and render the "Waiting for Bitcoin Node to finish syncing..." message on the frontend
-    // This way, sync percent is not shown until the Bitcoin node is done syncing
+    // If Litecoin Core is still syncing, we return -1 and render the "Waiting for Litecoin Core to finish syncing..." message on the frontend
+    // This way, sync percent is not shown until the Litecoin Core is done syncing
     const {
-      result: bitcoindResponse
-    } = await bitcoindService.getBlockChainInfo();
-    if (bitcoindResponse.initialblockdownload) {
+      result: litecoindResponse
+    } = await litecoindService.getBlockChainInfo();
+    if (litecoindResponse.initialblockdownload) {
       return -1;
     }
 
-    // if not IBD, then check bitcoind height to electrs height
+    // if not IBD, then check litecoind height to electrs height
     const initClient = await rpcClient.initElectrum({
       client: "umbrel",
       version: "1.4"
@@ -39,7 +40,7 @@ async function syncPercent() {
     const {
       height: electrsHeight
     } = await initClient.blockchainHeaders_subscribe();
-    return (electrsHeight / bitcoindResponse.blocks) * 100;
+    return (electrsHeight / litecoindResponse.blocks) * 100;
   } catch (error) {
     // If there's an error, which is likely due to a failed connection before Electrs is ready to accept connections, we return -2
     // and render "Connecting to Electrs server..." on the frontend

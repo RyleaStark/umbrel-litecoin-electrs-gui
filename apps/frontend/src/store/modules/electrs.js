@@ -8,7 +8,7 @@ const state = () => ({
     port: "",
     connectionString: "",
   },
-  // -1: Bitcoin node is still syncing
+  // -1: Litecoin Core is still syncing
   // -2: Electrs connection failed
   // >= 0: Electrs sync percent
   syncPercent: -2,

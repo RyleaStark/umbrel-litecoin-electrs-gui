@@ -6,7 +6,7 @@
       <div
         class="mr-6 flex items-center justify-center"
       >
-        <img class="rounded-3xl w-32 h-32" src="@/assets/icon.svg" />
+        <img class="rounded-3xl w-32 h-32" src="@/assets/icon.png" />
       </div>
       <div>
         <div class="flex items-center">
@@ -21,7 +21,7 @@
           </svg>
           <p class="ml-1 text-green-500 text-lg">Running</p>
         </div>
-        <h3 class="text-5xl font-semibold  dark:text-white">Electrs</h3>
+        <h3 class="text-5xl font-semibold  dark:text-white">Electrs (LTC)</h3>
         <div class="mt-2">
           <span class="text-gray-500 font-medium">{{
             version ? `${version}` : "..."
@@ -37,15 +37,15 @@
           <span class="align-self-end ml-1">Synchronized</span>
         </span>
         <span v-else class="animate-pulse">
-          Waiting for Bitcoin Node to finish syncing...
+          Waiting for Litecoin Core to finish syncing...
         </span>
       </h3>
     </div> -->
     <div class="flex justify-end mb-2">
       <h3 class="font-semibold mb-0 text-gray-800 dark:text-gray-200">
-        <!-- Case 1: Bitcoin Node still syncing -->
+        <!-- Case 1: Litecoin Core still syncing -->
         <span v-if="syncPercent === -1" class="animate-pulse">
-          Waiting for Bitcoin Node to finish syncing...
+          Waiting for Litecoin Core to finish syncing...
         </span>
         <!-- Case 2: Normal sync progress -->
         <span v-else-if="syncPercent >= 0">

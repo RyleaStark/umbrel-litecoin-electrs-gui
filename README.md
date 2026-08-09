@@ -1,43 +1,27 @@
-<p align="center">
-  <a href="https://umbrel.com">
-    <img src="https://i.imgur.com/5u1Eweg.jpg" alt="Logo">
-  </a>
-  <h1 align="center">Electrs for Umbrel</h1>
-  <p align="center">
-    Run an Electrum server on your Umbrel personal server. An official app by Umbrel. Powered by Electrs.
-    <br />
-    <a href="https://umbrel.com"><strong>umbrel.com »</strong></a>
-    <br />
-    <br />
-    <a href="https://twitter.com/umbrel">
-      <img src="https://img.shields.io/twitter/follow/umbrel?style=social" />
-    </a>
-    <a href="https://t.me/getumbrel">
-      <img src="https://img.shields.io/badge/community-chat-%235351FB">
-    </a>
-    <a href="https://reddit.com/r/getumbrel">
-      <img src="https://img.shields.io/reddit/subreddit-subscribers/getumbrel?style=social">
-    </a>
-    <a href="https://community.getumbrel.com">
-      <img src="https://img.shields.io/badge/community-forum-%235351FB">
-    </a>
-  </p>
-</p>
+# Electrs (LTC) for Umbrel
 
-## Getting started
+A Litecoin-aware fork of Umbrel's official Electrs status and connection GUI.
 
-This app can be installed in one click via the Umbrel App Store.
+This GUI is paired with [`RyleaStark/umbrel-electrs-ltc`](https://github.com/RyleaStark/umbrel-electrs-ltc), an actual Electrs implementation built against Litecoin's chain parameters. It is intentionally independent from the Fulcrum (LTC) app and runtime.
 
-## Contributing
+## Runtime contract
 
-We welcome and appreciate new contributions!
+The Umbrel package supplies:
 
-If you're a developer looking to help but not sure where to begin, look for [these issues](https://github.com/getumbrel/umbrel-electrs/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) that have specifically been marked as being friendly to new contributors.
+- `ELECTRS_HOST` and `ELECTRS_PORT` for the Electrs Electrum TCP service;
+- `LITECOIN_HOST`, `RPC_PORT`, `RPC_USER`, and `RPC_PASSWORD` for Litecoin Core;
+- `ELECTRUM_LOCAL_SERVICE` and `ELECTRUM_HIDDEN_SERVICE` for wallet connection instructions.
 
-If you're looking for a bigger challenge, before opening a pull request please [create an issue](https://github.com/getumbrel/umbrel-electrs/issues/new/choose) or [join our community chat](https://t.me/getumbrel) to get feedback, discuss the best way to tackle the challenge, and to ensure that there's no duplication of work.
+The `bitcoind-rpc` npm dependency is retained only as a protocol-compatible JSON-RPC client library. The configured daemon is Litecoin Core and all user-facing terminology is Litecoin-specific.
 
----
+## Build
 
-[![License](https://img.shields.io/github/license/getumbrel/umbrel-electrs?color=%235351FB)](https://github.com/getumbrel/umbrel-electrs/blob/master/LICENSE.md)
+```bash
+docker build -t umbrel-litecoin-electrs-gui .
+```
 
-[umbrel.com](https://umbrel.com)
+Tagged `v*` releases publish multi-architecture images to `ghcr.io/ryleastark/umbrel-litecoin-electrs-gui`.
+
+## License
+
+MIT
