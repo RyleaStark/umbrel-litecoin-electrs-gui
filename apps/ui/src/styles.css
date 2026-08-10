@@ -203,8 +203,8 @@ button { color: inherit; }
   box-shadow: 0 0 28px rgb(19 119 231 / 12%), inset 0 1px rgb(255 255 255 / 8%);
 }
 .index-art.is-syncing .index-block {
-  animation: index-travel 2.2s ease-in-out infinite;
-  animation-delay: calc(var(--block-index) * 140ms);
+  animation: index-progress-pulse 2.4s ease-in-out infinite;
+  animation-delay: calc(var(--pulse-index) * 120ms);
 }
 .index-art.is-complete { opacity: 0.92; }
 .index-art.is-complete .index-block {
@@ -324,9 +324,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, [role="tab"]:focus-v
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes dialog-in { from { opacity: 0; transform: translate(-50%, -48%) scale(0.95); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
 @keyframes loading { from { transform: translateX(-20%); } to { transform: translateX(160%); } }
-@keyframes index-travel {
-  0%, 48%, 100% { filter: brightness(0.9); transform: translateY(var(--block-y)) scale(1); }
-  18% { filter: brightness(1.55); transform: translateY(calc(var(--block-y) - 5px)) scale(1.045); }
+@keyframes index-progress-pulse {
+  0%, 42%, 100% { filter: brightness(1); transform: translateY(var(--block-y)) scale(1); }
+  14% {
+    filter: brightness(1.65);
+    transform: translateY(var(--block-y)) scale(1.055);
+    border-color: rgb(19 119 231 / 72%);
+    background: linear-gradient(145deg, rgb(19 119 231 / 42%), rgb(19 119 231 / 12%));
+    box-shadow: 0 0 30px rgb(19 119 231 / 24%), inset 0 1px rgb(255 255 255 / 14%);
+  }
 }
 
 @media (max-width: 767px) {
@@ -367,5 +373,5 @@ button:focus-visible, a:focus-visible, input:focus-visible, [role="tab"]:focus-v
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
-  .index-art .index-block { filter: none; transform: none; animation: none !important; }
+  .index-art .index-block { transform: none !important; filter: none !important; animation: none !important; }
 }

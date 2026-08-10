@@ -44,7 +44,7 @@ export function StatusHero({ status }: { status: IndexerStatus }) {
               <span
                 className={`index-block${index < indexedBlocks ? " is-indexed" : ""}`}
                 key={index}
-                style={{ "--block-index": index } as CSSProperties}
+                style={{ "--pulse-index": index } as CSSProperties}
               />
             ))}
           </div>
