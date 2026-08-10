@@ -31,6 +31,9 @@ describe("Electrs API", () => {
     expect(response.headers["content-security-policy"]).toContain("frame-ancestors 'none'");
     expect(response.headers["content-security-policy"]).toContain("style-src 'self' 'unsafe-inline'");
     expect(response.headers["content-security-policy"]).toContain("script-src 'self'");
+    expect(response.headers["content-security-policy"]).not.toContain("upgrade-insecure-requests");
+    expect(response.headers).not.toHaveProperty("cross-origin-opener-policy");
+    expect(response.headers).not.toHaveProperty("origin-agent-cluster");
   });
 
   it("serves the modern status contract and legacy compatibility routes", async () => {

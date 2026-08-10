@@ -30,9 +30,12 @@ export function buildApp({ service, serveUi = true }: { service: ElectrsGuiServi
         styleSrc: ["'self'", "'unsafe-inline'"],
         scriptSrc: ["'self'"],
         frameAncestors: ["'none'"],
+        upgradeInsecureRequests: null,
       },
     },
     crossOriginEmbedderPolicy: false,
+    crossOriginOpenerPolicy: false,
+    originAgentCluster: false,
   });
 
   app.get("/ping", async () => ({ version: "umbrel-middleware-0.1.12" }));
