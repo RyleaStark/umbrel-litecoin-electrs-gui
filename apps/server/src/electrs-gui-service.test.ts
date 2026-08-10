@@ -74,6 +74,40 @@ describe("ElectrsGuiService", () => {
     expect(await service.getLegacySyncPercent()).toBe(-2);
   });
 
+  it("reports real provider progress while the Electrs listener is closed for initial indexing", async () => {
+    const service = createElectrsGuiService({
+      core: { getBlockchainInfo: async () => ({ blocks: 3_157_425, initialblockdownload: false }) },
+      electrs: { getTip: async () => { throw new Error("listener closed during indexing"); }, getVersion: vi.fn() },
+      progress: { getIndexedHeight: async () => 87_000 },
+      connections
+    });
+
+    expect(await service.getStatus()).toEqual({
+      state: "indexing",
+      version: null,
+      coreHeight: 3_157_425,
+      indexedHeight: 87_000,
+      percent: 2.76,
+      message: "Indexing Litecoin blocks"
+    });
+    await expect(service.getLegacySyncPercent()).resolves.toBeCloseTo(2.7554, 4);
+  });
+
+  it.each([
+    ["equal to", 110],
+    ["ahead of", 111],
+  ])("never infers readiness from provider progress %s Core when the listener is unavailable", async (_label, indexedHeight) => {
+    const service = createElectrsGuiService({
+      core: { getBlockchainInfo: async () => ({ blocks: 110, initialblockdownload: false }) },
+      electrs: { getTip: async () => { throw new Error("listener unavailable"); }, getVersion: vi.fn() },
+      progress: { getIndexedHeight: async () => indexedHeight },
+      connections
+    });
+
+    expect(await service.getStatus()).toMatchObject({ state: "connecting", indexedHeight: null, percent: null });
+    expect(await service.getLegacySyncPercent()).toBe(-2);
+  });
+
   it("preserves the legacy unclamped synchronization percentage", async () => {
     const service = createElectrsGuiService({
       core: { getBlockchainInfo: async () => ({ blocks: 100, initialblockdownload: false }) },

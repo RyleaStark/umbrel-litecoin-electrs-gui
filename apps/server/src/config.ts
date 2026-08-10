@@ -7,6 +7,8 @@ const environmentSchema = z.object({
   PORT: port.default(3006),
   ELECTRS_HOST: nonempty.default("0.0.0.0"),
   ELECTRS_PORT: port.default(50002),
+  ELECTRS_PROGRESS_HOST: nonempty.default("0.0.0.0"),
+  ELECTRS_PROGRESS_PORT: port.default(5514),
   ELECTRUM_PORT: port.default(51001),
   ELECTRUM_LOCAL_SERVICE: nonempty.default("umbrel.local"),
   ELECTRUM_HIDDEN_SERVICE: nonempty.default("/var/lib/tor/electrum/hostname"),
@@ -27,6 +29,7 @@ export function readConfig(environment: NodeJS.ProcessEnv | Record<string, strin
   return {
     port: parsed.data.PORT,
     electrs: { host: parsed.data.ELECTRS_HOST, port: parsed.data.ELECTRS_PORT },
+    progress: { host: parsed.data.ELECTRS_PROGRESS_HOST, port: parsed.data.ELECTRS_PROGRESS_PORT },
     connections: {
       localHost: parsed.data.ELECTRUM_LOCAL_SERVICE,
       torHost: parsed.data.ELECTRUM_HIDDEN_SERVICE,

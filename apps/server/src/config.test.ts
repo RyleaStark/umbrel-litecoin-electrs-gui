@@ -32,6 +32,15 @@ describe("server config", () => {
     });
   });
 
+  it("configures the bounded live Electrs progress receiver", () => {
+    expect(readConfig({ RPC_PASSWORD: "secret" }).progress).toEqual({ host: "0.0.0.0", port: 5514 });
+    expect(readConfig({
+      RPC_PASSWORD: "secret",
+      ELECTRS_PROGRESS_HOST: "127.0.0.1",
+      ELECTRS_PROGRESS_PORT: "15514"
+    }).progress).toEqual({ host: "127.0.0.1", port: 15514 });
+  });
+
   it("rejects missing credentials rather than shipping fallback secrets", () => {
     expect(() => readConfig({})).toThrow("Invalid Electrs GUI configuration");
   });

@@ -1,6 +1,7 @@
 import type { ConnectionDetails } from "../../../packages/contracts/src/connections.js";
 import { deriveIndexerStatus, type IndexerStatus } from "../../../packages/contracts/src/status.js";
 import type { ElectrsGuiService } from "./app.js";
+import type { ElectrsProgress } from "./electrs-log-progress.js";
 
 export interface LitecoinCoreClient {
   getBlockchainInfo(): Promise<{ blocks: number; initialblockdownload: boolean }>;
@@ -11,13 +12,19 @@ export interface ElectrsClient {
   getVersion(): Promise<string>;
 }
 
+function isInitialIndexingProgress(indexedHeight: number | null | undefined, coreHeight: number): indexedHeight is number {
+  return indexedHeight !== null && indexedHeight !== undefined && indexedHeight < coreHeight;
+}
+
 export function createElectrsGuiService({
   core,
   electrs,
+  progress,
   connections,
 }: {
   core: LitecoinCoreClient;
   electrs: ElectrsClient;
+  progress?: ElectrsProgress;
   connections: ConnectionDetails;
 }): ElectrsGuiService {
   return {
@@ -31,6 +38,12 @@ export function createElectrsGuiService({
         const indexedHeight = await electrs.getTip();
         return (indexedHeight / coreInfo.blocks) * 100;
       } catch {
+        const coreInfo = await core.getBlockchainInfo().catch(() => null);
+        if (!coreInfo || coreInfo.initialblockdownload) return -2;
+        const indexedHeight = await progress?.getIndexedHeight();
+        if (isInitialIndexingProgress(indexedHeight, coreInfo.blocks)) {
+          return (indexedHeight / coreInfo.blocks) * 100;
+        }
         return -2;
       }
     },
@@ -70,9 +83,10 @@ export function createElectrsGuiService({
           version,
         });
       } catch {
+        const indexedHeight = await progress?.getIndexedHeight() ?? null;
         return deriveIndexerStatus({
           coreHeight: coreInfo.blocks,
-          indexedHeight: null,
+          indexedHeight: isInitialIndexingProgress(indexedHeight, coreInfo.blocks) ? indexedHeight : null,
           initialBlockDownload: false,
           version: null,
         });
