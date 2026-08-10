@@ -1,6 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { ConnectionPanel } from "./ConnectionPanel.js";
 
 const details = {
@@ -9,6 +9,12 @@ const details = {
 };
 
 describe("ConnectionPanel", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: undefined });
+    Reflect.deleteProperty(document, "execCommand");
+  });
+
   it("switches between distinct Local and Tor endpoints", async () => {
     render(<ConnectionPanel details={details} />);
     await userEvent.click(screen.getByRole("button", { name: "Connect" }));
@@ -24,9 +30,40 @@ describe("ConnectionPanel", () => {
     expect(image.getAttribute("src")).toMatch(/^data:image\/svg\+xml/);
   });
 
-  it("copies the complete wallet connection string", async () => {
+  it("copies every value on an insecure HTTP origin without the modern clipboard API", async () => {
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: undefined });
+    const copied: string[] = [];
+    Object.defineProperty(document, "execCommand", {
+      configurable: true,
+      value: vi.fn((command: string) => {
+        expect(command).toBe("copy");
+        copied.push(document.getSelection()?.toString() ?? "");
+        return true;
+      }),
+    });
+
+    render(<ConnectionPanel details={details} />);
+    await userEvent.click(screen.getByRole("button", { name: "Connect" }));
+
+    const controls = [
+      ["Copy address", "electrs.example.onion"],
+      ["Copy port", "51001"],
+      ["Copy connection string", "electrs.example.onion:51001:t"],
+    ] as const;
+
+    for (const [name, payload] of controls) {
+      const button = screen.getByRole("button", { name });
+      await userEvent.click(button);
+      expect(copied.at(-1)).toBe(payload);
+      expect(within(button.parentElement!).getByText("Copied!")).toBeVisible();
+    }
+
+    expect(copied).toEqual(controls.map(([, payload]) => payload));
+  });
+
+  it("copies the complete wallet connection string with the modern clipboard API", async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, { clipboard: { writeText } });
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
     render(<ConnectionPanel details={details} />);
     await userEvent.click(screen.getByRole("button", { name: "Connect" }));
     await userEvent.click(screen.getByRole("button", { name: "Copy connection string" }));
@@ -34,8 +71,35 @@ describe("ConnectionPanel", () => {
     expect(screen.getByText("Copied!")).toBeInTheDocument();
   });
 
+  it("falls back locally when the modern clipboard API rejects", async () => {
+    const writeText = vi.fn().mockRejectedValue(new DOMException("NotAllowedError"));
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
+    const copied: string[] = [];
+    Object.defineProperty(document, "execCommand", {
+      configurable: true,
+      value: vi.fn(() => {
+        copied.push(document.getSelection()?.toString() ?? "");
+        return true;
+      }),
+    });
+
+    render(<ConnectionPanel details={details} />);
+    await userEvent.click(screen.getByRole("button", { name: "Connect" }));
+    const button = screen.getByRole("button", { name: "Copy port" });
+    await userEvent.click(button);
+
+    expect(writeText).toHaveBeenCalledWith("51001");
+    expect(copied).toEqual(["51001"]);
+    expect(within(button.parentElement!).getByText("Copied!")).toBeVisible();
+  });
+
   it("reports a clipboard failure without exposing an internal error", async () => {
-    Object.assign(navigator, { clipboard: { writeText: vi.fn().mockRejectedValue(new Error("private clipboard detail")) } });
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: vi.fn().mockRejectedValue(new Error("private clipboard detail")) },
+    });
+    Object.defineProperty(document, "execCommand", { configurable: true, value: vi.fn(() => false) });
+    vi.spyOn(window, "prompt").mockReturnValue(null);
     render(<ConnectionPanel details={details} />);
     await userEvent.click(screen.getByRole("button", { name: "Connect" }));
     await userEvent.click(screen.getByRole("button", { name: "Copy address" }));

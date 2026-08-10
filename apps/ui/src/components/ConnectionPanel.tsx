@@ -3,18 +3,15 @@ import * as Tabs from "@radix-ui/react-tabs";
 import { Check, Copy, WalletCards, X } from "lucide-react";
 import { useState } from "react";
 import type { Connection, ConnectionDetails } from "@contracts/connections";
+import { copyText } from "../clipboard.js";
 import { ConnectionQr } from "./QrCodeDialog.js";
 
 function CopyRow({ label, value, copyLabel }: { label: string; value: string; copyLabel: string }) {
   const [feedback, setFeedback] = useState<"" | "Copied!" | "Copy failed">("");
 
   async function copy() {
-    try {
-      await navigator.clipboard.writeText(value);
-      setFeedback("Copied!");
-    } catch {
-      setFeedback("Copy failed");
-    }
+    const copied = await copyText(value);
+    setFeedback(copied ? "Copied!" : "Copy failed");
     window.setTimeout(() => setFeedback(""), 900);
   }
 
