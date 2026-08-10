@@ -7,6 +7,7 @@ services:
     environment:
       ELECTRUM_HIDDEN_SERVICE: "notyetset.onion"
       ELECTRUM_LOCAL_SERVICE: "localhost"
+      ELECTRUM_PORT: "51001"
       ELECTRS_HOST: electrs
       ELECTRS_PORT: "50002"
       LITECOIN_HOST: litecoind
