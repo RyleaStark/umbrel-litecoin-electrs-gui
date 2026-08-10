@@ -3,8 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 import { createElectrsGuiService } from "./electrs-gui-service.js";
 
 const connections = {
-  local: { address: "umbrel.local", port: 51001, connectionString: "umbrel.local:51001:t", transport: "tcp" as const },
-  tor: { address: "example.onion", port: 51001, connectionString: "example.onion:51001:t", transport: "tcp" as const }
+  local: { address: "umbrel.local", port: 51001, connectionString: "umbrel.local:51001", transport: "tcp" as const },
+  tor: { address: "example.onion", port: 51001, connectionString: "example.onion:51001", transport: "tcp" as const }
 };
 
 describe("ElectrsGuiService", () => {

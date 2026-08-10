@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { IndexerStatus } from "@contracts/status";
 
 const runtimeLabels: Record<IndexerStatus["state"], string> = {
@@ -25,6 +26,7 @@ export function StatusHero({ status }: { status: IndexerStatus }) {
   const indexedBlocks = status.state === "ready" ? 6 : Math.floor((progress / 100) * 6);
   const synchronized = status.state === "ready";
   const syncTitle = synchronized ? "Synchronized" : status.state === "indexing" ? "Synchronizing" : runtimeLabels[status.state];
+  const artStateClass = status.state === "indexing" ? " is-syncing" : synchronized ? " is-complete" : "";
 
   return (
     <section className="status-card" aria-label="Electrs status">
@@ -37,9 +39,13 @@ export function StatusHero({ status }: { status: IndexerStatus }) {
             <span>{runtimeLabels[status.state]}</span>
           </div>
 
-          <div className="index-art" aria-hidden="true">
+          <div className={`index-art${artStateClass}`} aria-hidden="true">
             {Array.from({ length: 6 }, (_, index) => (
-              <span className={index < indexedBlocks ? "is-indexed" : undefined} key={index} />
+              <span
+                className={`index-block${index < indexedBlocks ? " is-indexed" : ""}`}
+                key={index}
+                style={{ "--block-index": index } as CSSProperties}
+              />
             ))}
           </div>
 

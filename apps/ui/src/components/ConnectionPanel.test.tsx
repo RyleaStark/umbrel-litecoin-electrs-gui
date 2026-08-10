@@ -4,8 +4,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { ConnectionPanel } from "./ConnectionPanel.js";
 
 const details = {
-  local: { address: "umbrel.local", port: 51001, connectionString: "umbrel.local:51001:t", transport: "tcp" as const },
-  tor: { address: "electrs.example.onion", port: 51001, connectionString: "electrs.example.onion:51001:t", transport: "tcp" as const }
+  local: { address: "umbrel.local", port: 51001, connectionString: "umbrel.local:51001", transport: "tcp" as const },
+  tor: { address: "electrs.example.onion", port: 51001, connectionString: "electrs.example.onion:51001", transport: "tcp" as const }
 };
 
 describe("ConnectionPanel", () => {
@@ -26,8 +26,23 @@ describe("ConnectionPanel", () => {
   it("shows a QR code for the active wallet connection", async () => {
     render(<ConnectionPanel details={details} />);
     await userEvent.click(screen.getByRole("button", { name: "Connect" }));
-    const image = await screen.findByRole("img", { name: "QR code for electrs.example.onion:51001:t" });
+    const image = await screen.findByRole("img", { name: "QR code for electrs.example.onion:51001" });
     expect(image.getAttribute("src")).toMatch(/^data:image\/svg\+xml/);
+  });
+
+  it("orders the connection contract rows and exposes SSL as read-only None", async () => {
+    const { container } = render(<ConnectionPanel details={details} />);
+    await userEvent.click(screen.getByRole("button", { name: "Connect" }));
+
+    const rows = Array.from(container.ownerDocument.querySelectorAll(".connection-row"));
+    expect(rows.map((row) => row.querySelector(".row-label")?.textContent)).toEqual([
+      "Address",
+      "Port",
+      "Connection string",
+      "SSL",
+    ]);
+    expect(rows.at(-1)?.querySelector(".row-value")).toHaveTextContent("None");
+    expect(within(rows.at(-1) as HTMLElement).queryByRole("button")).not.toBeInTheDocument();
   });
 
   it("copies every value on an insecure HTTP origin without the modern clipboard API", async () => {
@@ -48,7 +63,7 @@ describe("ConnectionPanel", () => {
     const controls = [
       ["Copy address", "electrs.example.onion"],
       ["Copy port", "51001"],
-      ["Copy connection string", "electrs.example.onion:51001:t"],
+      ["Copy connection string", "electrs.example.onion:51001"],
     ] as const;
 
     for (const [name, payload] of controls) {
@@ -67,7 +82,7 @@ describe("ConnectionPanel", () => {
     render(<ConnectionPanel details={details} />);
     await userEvent.click(screen.getByRole("button", { name: "Connect" }));
     await userEvent.click(screen.getByRole("button", { name: "Copy connection string" }));
-    expect(writeText).toHaveBeenCalledWith("electrs.example.onion:51001:t");
+    expect(writeText).toHaveBeenCalledWith("electrs.example.onion:51001");
     expect(screen.getByText("Copied!")).toBeInTheDocument();
   });
 

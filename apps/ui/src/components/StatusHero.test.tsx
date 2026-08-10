@@ -11,5 +11,23 @@ describe("StatusHero", () => {
     expect(screen.queryByText("Synchronized")).not.toBeInTheDocument();
     expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "99.01");
     expect(container.querySelectorAll(".is-indexed")).toHaveLength(5);
+    expect(container.querySelector(".index-art")).toHaveClass("is-syncing");
+    expect(container.querySelectorAll(".index-block")).toHaveLength(6);
+  });
+
+  it("renders ready as six complete solid blocks without a syncing class", () => {
+    const { container } = render(<StatusHero status={{ state: "ready", version: "0.9.12", coreHeight: 101, indexedHeight: 101, percent: 100, message: "Electrs is synchronized" }} />);
+    const art = container.querySelector(".index-art");
+    expect(art).toHaveClass("is-complete");
+    expect(art).not.toHaveClass("is-syncing");
+    expect(container.querySelectorAll(".index-block.is-indexed")).toHaveLength(6);
+  });
+
+  it.each(["waiting-for-core", "connecting", "degraded"] as const)("does not animate blocks while %s", (state) => {
+    const { container } = render(<StatusHero status={{ state, version: null, coreHeight: null, indexedHeight: null, percent: null, message: "Not indexing" }} />);
+    const art = container.querySelector(".index-art");
+    expect(art).not.toHaveClass("is-syncing");
+    expect(art).not.toHaveClass("is-complete");
+    expect(container.querySelectorAll(".index-block")).toHaveLength(6);
   });
 });

@@ -5,8 +5,8 @@ import { App } from "./App.js";
 
 const status = { state: "ready", version: "0.9.12", coreHeight: 110, indexedHeight: 110, percent: 100, message: "Electrs is synchronized" };
 const connections = {
-  local: { address: "umbrel.local", port: 51001, connectionString: "umbrel.local:51001:t", transport: "tcp" },
-  tor: { address: "example.onion", port: 51001, connectionString: "example.onion:51001:t", transport: "tcp" }
+  local: { address: "umbrel.local", port: 51001, connectionString: "umbrel.local:51001", transport: "tcp" },
+  tor: { address: "example.onion", port: 51001, connectionString: "example.onion:51001", transport: "tcp" }
 };
 
 afterEach(() => vi.unstubAllGlobals());
