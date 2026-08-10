@@ -24,6 +24,16 @@ describe("StatusHero", () => {
     expect(blocks.map((block) => block.style.getPropertyValue("--pulse-index"))).toEqual(["0", "1", "2", "3", "4", "5"]);
   });
 
+  it("renders an independently fadeable pulse layer inside every indexing block", () => {
+    const { container } = render(<StatusHero status={{ state: "indexing", version: "0.9.12", coreHeight: 100, indexedHeight: 42, percent: 42, message: "Indexing Litecoin blocks" }} />);
+
+    expect(container.querySelectorAll(".index-block")).toHaveLength(6);
+    expect(container.querySelectorAll(".index-block-pulse-fade")).toHaveLength(6);
+    expect(container.querySelectorAll(".index-block-pulse")).toHaveLength(6);
+    expect(container.querySelectorAll(".index-block-complete")).toHaveLength(6);
+  });
+
+
   it("renders ready as six complete solid blocks without a syncing class", () => {
     const { container } = render(<StatusHero status={{ state: "ready", version: "0.9.12", coreHeight: 101, indexedHeight: 101, percent: 100, message: "Electrs is synchronized" }} />);
     const art = container.querySelector(".index-art");
