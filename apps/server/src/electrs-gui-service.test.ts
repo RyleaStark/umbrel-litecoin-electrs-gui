@@ -93,6 +93,41 @@ describe("ElectrsGuiService", () => {
     await expect(service.getLegacySyncPercent()).resolves.toBeCloseTo(2.7554, 4);
   });
 
+  it("reports Electrs' active transaction-index phase from the exact live metrics shape instead of Connecting", async () => {
+    const service = createElectrsGuiService({
+      core: { getBlockchainInfo: async () => ({ blocks: 3_157_834, initialblockdownload: false }) },
+      electrs: { getTip: async () => { throw new Error("listener closed during initial update"); }, getVersion: vi.fn() },
+      metrics: { getInitialIndexPhase: async () => ({ phase: "transactions" as const, tipHeight: 0 }) },
+      connections
+    });
+
+    expect(await service.getStatus()).toEqual({
+      state: "indexing",
+      version: null,
+      coreHeight: 3_157_834,
+      indexedHeight: null,
+      percent: null,
+      message: "Building Electrs transaction index"
+    });
+    await expect(service.getLegacySyncPercent()).resolves.toBe(-2);
+  });
+
+  it("distinguishes Electrs' own history-index phase from transaction indexing", async () => {
+    const service = createElectrsGuiService({
+      core: { getBlockchainInfo: async () => ({ blocks: 3_157_834, initialblockdownload: false }) },
+      electrs: { getTip: async () => { throw new Error("listener closed during initial update"); }, getVersion: vi.fn() },
+      metrics: { getInitialIndexPhase: async () => ({ phase: "history" as const, tipHeight: 0 }) },
+      connections
+    });
+
+    expect(await service.getStatus()).toMatchObject({
+      state: "indexing",
+      indexedHeight: null,
+      percent: null,
+      message: "Building Electrs history index"
+    });
+  });
+
   it.each([
     ["equal to", 110],
     ["ahead of", 111],
@@ -106,6 +141,20 @@ describe("ElectrsGuiService", () => {
 
     expect(await service.getStatus()).toMatchObject({ state: "connecting", indexedHeight: null, percent: null });
     expect(await service.getLegacySyncPercent()).toBe(-2);
+  });
+
+  it.each([
+    ["equal to", 110],
+    ["ahead of", 111],
+  ])("never infers readiness from metrics tip %s Core while the provider listener is unavailable", async (_label, tipHeight) => {
+    const service = createElectrsGuiService({
+      core: { getBlockchainInfo: async () => ({ blocks: 110, initialblockdownload: false }) },
+      electrs: { getTip: async () => { throw new Error("listener unavailable"); }, getVersion: vi.fn() },
+      metrics: { getInitialIndexPhase: async () => ({ phase: "history", tipHeight }) },
+      connections
+    });
+
+    expect(await service.getStatus()).toMatchObject({ state: "connecting", indexedHeight: null, percent: null });
   });
 
   it("preserves the legacy unclamped synchronization percentage", async () => {

@@ -5,6 +5,7 @@ import { readConfig } from "./config.js";
 import { createElectrsClient } from "./electrs-client.js";
 import { createElectrsGuiService } from "./electrs-gui-service.js";
 import { createElectrsLogProgress, startElectrsLogReceiver } from "./electrs-log-progress.js";
+import { createElectrsMetricsClient } from "./electrs-metrics-client.js";
 import { createLitecoinCoreClient } from "./litecoin-core-client.js";
 
 const config = readConfig(process.env);
@@ -19,6 +20,7 @@ const service = createElectrsGuiService({
   core: createLitecoinCoreClient(config.core),
   electrs: createElectrsClient(config.electrs),
   progress,
+  metrics: createElectrsMetricsClient(config.metrics),
   connections: createConnectionDetails(config.connections),
 });
 const app = buildApp({ service });

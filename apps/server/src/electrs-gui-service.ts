@@ -2,6 +2,7 @@ import type { ConnectionDetails } from "../../../packages/contracts/src/connecti
 import { deriveIndexerStatus, type IndexerStatus } from "../../../packages/contracts/src/status.js";
 import type { ElectrsGuiService } from "./app.js";
 import type { ElectrsProgress } from "./electrs-log-progress.js";
+import type { ElectrsMetricsClient, ElectrsInitialIndexPhase } from "./electrs-metrics-client.js";
 
 export interface LitecoinCoreClient {
   getBlockchainInfo(): Promise<{ blocks: number; initialblockdownload: boolean }>;
@@ -16,15 +17,30 @@ function isInitialIndexingProgress(indexedHeight: number | null | undefined, cor
   return indexedHeight !== null && indexedHeight !== undefined && indexedHeight < coreHeight;
 }
 
+function activePhaseStatus(phase: ElectrsInitialIndexPhase, coreHeight: number): IndexerStatus {
+  return {
+    state: "indexing",
+    version: null,
+    coreHeight,
+    indexedHeight: null,
+    percent: null,
+    message: phase === "transactions"
+      ? "Building Electrs transaction index"
+      : "Building Electrs history index",
+  };
+}
+
 export function createElectrsGuiService({
   core,
   electrs,
   progress,
+  metrics,
   connections,
 }: {
   core: LitecoinCoreClient;
   electrs: ElectrsClient;
   progress?: ElectrsProgress;
+  metrics?: ElectrsMetricsClient;
   connections: ConnectionDetails;
 }): ElectrsGuiService {
   return {
@@ -84,9 +100,23 @@ export function createElectrsGuiService({
         });
       } catch {
         const indexedHeight = await progress?.getIndexedHeight() ?? null;
+        if (isInitialIndexingProgress(indexedHeight, coreInfo.blocks)) {
+          return deriveIndexerStatus({
+            coreHeight: coreInfo.blocks,
+            indexedHeight,
+            initialBlockDownload: false,
+            version: null,
+          });
+        }
+
+        const providerPhase = await metrics?.getInitialIndexPhase().catch(() => null) ?? null;
+        if (providerPhase && providerPhase.tipHeight < coreInfo.blocks) {
+          return activePhaseStatus(providerPhase.phase, coreInfo.blocks);
+        }
+
         return deriveIndexerStatus({
           coreHeight: coreInfo.blocks,
-          indexedHeight: isInitialIndexingProgress(indexedHeight, coreInfo.blocks) ? indexedHeight : null,
+          indexedHeight: null,
           initialBlockDownload: false,
           version: null,
         });

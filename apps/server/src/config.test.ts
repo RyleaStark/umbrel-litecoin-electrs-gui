@@ -41,6 +41,16 @@ describe("server config", () => {
     }).progress).toEqual({ host: "127.0.0.1", port: 15514 });
   });
 
+  it("uses Electrs' private monitoring listener for authoritative active phase classification", () => {
+    expect(readConfig({ RPC_PASSWORD: "secret", ELECTRS_HOST: "electrs" }).metrics).toEqual({ host: "electrs", port: 4224 });
+    expect(readConfig({
+      RPC_PASSWORD: "secret",
+      ELECTRS_HOST: "electrs",
+      ELECTRS_MONITORING_HOST: "electrs-monitoring",
+      ELECTRS_MONITORING_PORT: "14224"
+    }).metrics).toEqual({ host: "electrs-monitoring", port: 14224 });
+  });
+
   it("rejects missing credentials rather than shipping fallback secrets", () => {
     expect(() => readConfig({})).toThrow("Invalid Electrs GUI configuration");
   });

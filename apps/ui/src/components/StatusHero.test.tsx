@@ -15,6 +15,16 @@ describe("StatusHero", () => {
     expect(container.querySelectorAll(".index-block")).toHaveLength(6);
   });
 
+  it("renders provider transaction indexing without fabricating a height or percentage", () => {
+    const { container } = render(<StatusHero status={{ state: "indexing", version: null, coreHeight: 3_157_834, indexedHeight: null, percent: null, message: "Building Electrs transaction index" }} />);
+
+    expect(screen.getByText("Building Electrs transaction index")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveAccessibleName("Electrs is indexing");
+    expect(screen.getByRole("progressbar")).not.toHaveAttribute("aria-valuenow");
+    expect(screen.queryByText(/%$/)).not.toBeInTheDocument();
+    expect(container.querySelector(".index-art")).toHaveClass("is-syncing");
+  });
+
   it("assigns progressive pulse indices to all six blocks at 2.8% indexing", () => {
     const { container } = render(<StatusHero status={{ state: "indexing", version: "0.9.12", coreHeight: 100, indexedHeight: 2, percent: 2.8, message: "Indexing Litecoin blocks" }} />);
     const blocks = Array.from(container.querySelectorAll<HTMLElement>(".index-block"));
