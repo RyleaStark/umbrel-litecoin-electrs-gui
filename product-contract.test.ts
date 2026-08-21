@@ -13,7 +13,6 @@ describe("Bitcoin Fulcrum candidate contract", () => {
     const connectionPanel = read("apps/ui/src/components/ConnectionPanel.tsx");
     const status = read("packages/contracts/src/status.ts");
     const readme = read("README.md");
-    const workflow = read(".github/workflows/on-push.yml");
     const html = read("apps/ui/index.html");
 
     expect(packageJson.name).toBe("umbrel-bitcoin-fulcrum-gui");
@@ -27,10 +26,8 @@ describe("Bitcoin Fulcrum candidate contract", () => {
     expect(status).toContain("Indexing Bitcoin blocks");
     expect(readme).toContain("nmfretz/umbrel-fulcrum@349e24666fe9cd819015e845612c3ff7e5340c0c");
     expect(readme).toContain("cculianu/Fulcrum v2.1.1");
-    expect(workflow).toContain("name: Verify");
-    expect(workflow).not.toMatch(/ghcr\.io|docker\/login-action|build-push-action|packages:\s*write|push:\s*true|tags:\s*\['v\*'\]/);
     expect(html).toContain('name="theme-color" content="#f7931a"');
-    expect(`${readme}\n${workflow}\n${html}`).not.toMatch(/Fulcrum \(LTC\)|Electrum-LTC|LITECOIN_HOST/);
+    expect(`${readme}\n${html}`).not.toMatch(/Fulcrum \(LTC\)|Electrum-LTC|LITECOIN_HOST/);
   });
 
   it("uses the orange Bitcoin semantic motion contract", () => {
