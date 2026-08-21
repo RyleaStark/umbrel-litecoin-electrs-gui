@@ -25,7 +25,7 @@ describe("Bitcoin Fulcrum candidate contract", () => {
     expect(status).toContain("Waiting for Bitcoin Core to finish syncing");
     expect(status).toContain("Indexing Bitcoin blocks");
     expect(readme).toContain("nmfretz/umbrel-fulcrum@349e24666fe9cd819015e845612c3ff7e5340c0c");
-    expect(readme).toContain("cculianu/Fulcrum v2.1.1");
+    expect(readme).toContain("cculianu/Fulcrum v2.1.2");
     expect(html).toContain('name="theme-color" content="#f7931a"');
     expect(`${readme}\n${html}`).not.toMatch(/Fulcrum \(LTC\)|Electrum-LTC|LITECOIN_HOST/);
   });
@@ -46,9 +46,9 @@ describe("Bitcoin Fulcrum candidate contract", () => {
     expect(css).toContain(".index-art.is-complete .index-block-pulse { animation-name: none; }");
   });
 
-  it("retains Fulcrum 2.1.1 and Bitcoin wallet/admin topology", () => {
+  it("retains Fulcrum 2.1.2 and Bitcoin wallet/admin topology", () => {
     const compose = read("docker-compose.yml");
-    expect(compose).toContain("cculianu/fulcrum:v2.1.1@sha256:72d8b2f9142f83a51c6c3ba2f6931b496a08bede610b28ef2315b87aa1e3bb64");
+    expect(compose).toContain("cculianu/fulcrum:v2.1.2@sha256:0af448db05f259206a55d68d099a4742168e9eaedb007e8f700b31920653375f");
     expect(compose).toContain("TCP: 0.0.0.0:50002");
     expect(compose).toContain("ADMIN: 0.0.0.0:8000");
     expect(compose).toContain('"50002:50002"');

@@ -4,7 +4,7 @@ A modern, independently maintained Bitcoin Fulcrum status and wallet-connection 
 
 ## Provenance and scope
 
-This repository is a GUI/backend-facade modernization of `nmfretz/umbrel-fulcrum@349e24666fe9cd819015e845612c3ff7e5340c0c`, the exact source behind the canonical `nmfretz/umbrel-fulcrum:1.0.1` GUI lineage. The canonical Umbrel package currently pins `cculianu/Fulcrum v2.1.1`; this candidate intentionally retains that daemon version and its wallet/admin topology.
+This repository is a GUI/backend-facade modernization of `nmfretz/umbrel-fulcrum@349e24666fe9cd819015e845612c3ff7e5340c0c`, the exact source behind the canonical `nmfretz/umbrel-fulcrum:1.0.1` GUI lineage. The canonical Umbrel package currently pins `cculianu/Fulcrum v2.1.2`; this candidate retains that daemon version and its wallet/admin topology.
 
 The modernization preserves Bitcoin branding, Core RPC semantics, environment variables, ports, endpoints, and connection behavior while updating the architecture and interaction model.
 
@@ -50,7 +50,7 @@ npm run test:coverage
 npm run build
 ```
 
-`docker compose up --build` provides an inert local regtest topology with the retained Fulcrum `2.1.1` daemon. It is not an Umbrel deployment recipe.
+`docker compose up --build` provides an inert local regtest topology with the retained Fulcrum `2.1.2` daemon. It is not an Umbrel deployment recipe.
 
 ## Container
 

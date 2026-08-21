@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { createFulcrumStatsClient } from "./fulcrum-stats-client.js";
 
 describe("FulcrumStatsClient", () => {
-  it("reads provider-owned indexed and target heights from the v2.1.1 /stats shape", async () => {
+  it("reads provider-owned indexed and target heights from the v2.1.x /stats shape", async () => {
     const fetchFn = vi.fn(async () => new Response(JSON.stringify({
       Controller: {
         "Header count": 87_001,
