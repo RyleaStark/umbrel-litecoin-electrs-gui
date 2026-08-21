@@ -1,6 +1,6 @@
 {
   "name": "umbrel-litecoin-electrs-gui",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "private": true,
   "type": "module",
   "description": "Electrs for Litecoin — Umbrel application interface",
