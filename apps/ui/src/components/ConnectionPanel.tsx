@@ -126,6 +126,7 @@ export function ConnectionPanel({ details }: { details: ConnectionDetails }) {
         <Dialog.Overlay className="dialog-overlay" />
         <Dialog.Content className="connection-dialog">
           <span className="gradient-border" aria-hidden="true" />
+          <div className="connection-dialog-scroll">
           <div className="dialog-header">
             <Dialog.Title><WalletCards aria-hidden="true" /> Connect to Fulcrum</Dialog.Title>
             <Dialog.Description>
@@ -136,6 +137,7 @@ export function ConnectionPanel({ details }: { details: ConnectionDetails }) {
           <Tabs.Root value={network} onValueChange={(value) => setNetwork(value as "local" | "tor")}>
             <ConnectionBody connection={connection} network={network} />
           </Tabs.Root>
+          </div>
 
           <Dialog.Close asChild>
             <button type="button" className="dialog-close" aria-label="Close connection details"><X aria-hidden="true" /></button>
